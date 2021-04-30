@@ -1,0 +1,7 @@
+#clean the receptor, remove unwanted chains, remove water, add hydrogens, remove non polar and save as a pdb file
+echo Convertng the receptor pdb into a charged mol2 file... >> logfile  
+obabel -ipdb receptor.pdb -omol2 -Oreceptor.mol2 --partialcharge gasteiger 2>> logfile
+echo Checking the overall charge in the molecule. The overall charge must be close to zero >> logfile
+python scripts/mol2_check.py -i receptor.mol2 >> logfile
+echo Converting the mol2 file to pdbqt file as a rigid molecule... >> logfile
+obabel -imol2 receptor.mol2 -opdbqt -Oreceptor.pdbqt -xcr 2>> logfile

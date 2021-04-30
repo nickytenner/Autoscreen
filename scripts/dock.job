@@ -1,0 +1,13 @@
+#Get the ligand sdf file
+echo Converting the ligand sdf file to pdbqt... >> ../logfile
+obabel -isdf ligand.sdf -opdbqt -Oligand.pdbqt --partialcharge gasteiger --gen3d 2>> ../logfile
+obabel -isdf ligand.sdf -oxyz -Oligand.xyz --gen3d 2>> ../logfile
+echo Checking the charges in the ligand... >> ../logfile
+python ../scripts/pdbqt_check.py -i ligand.pdbqt >> ../logfile
+echo Generating inputs for autogrid and autodock... >> ../logfile 
+python ../scripts/pdbqt_to_pf.py --irec receptor.pdbqt --ilig ligand.pdbqt --ogpf grid.gpf --odpf dock.dpf --grid 100 100 100 --spacing 0.25 --center -11.0 21.0 72.0 >> ../logfile
+echo Running autogrid... >> ../logfile
+../scripts/autogrid4 -p grid.gpf -l grid.glg >> ../logfile
+echo Running autodock... >> ../logfile
+../scripts/autodock4 -p dock.dpf -l dock.dlg  >> ../logfile
+grep -in "Free Energy of Binding" dock.dlg >> ../logfile
